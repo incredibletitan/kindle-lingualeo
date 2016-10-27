@@ -1,13 +1,10 @@
 <?php
-$config = require 'config.php';
+require_once 'classes/ConfigHelper.php';
+require_once 'classes/DbConnection.php';
+require_once 'classes/Vocabulary.php';
 
-try {
-    $dbh = new PDO('sqlite:' . $config['path_to_vocabulary']);
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $query =  "SELECT `w`.`stem` FROM `WORDS` `w`";
-    $smt = $dbh->prepare($query);
-    $smt->execute();
-    $obj = $smt->fetchAll(PDO::FETCH_OBJ);
-} catch (PDOException $ex) {
-    echo $ex->getMessage();
-}
+$vocabulary = new Vocabulary();
+//TODO: delete this
+echo "<pre>";
+print_r(var_export($vocabulary->getVocabulary(), true));
+echo "</pre>";
