@@ -1,0 +1,12 @@
+{
+    "name": "root/kindle-lingualeo",
+    "authors": [
+        {
+            "name": "Yuriy Stos",
+            "email": "100sbsh@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "~6.0"
+    }
+}
