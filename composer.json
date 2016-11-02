@@ -8,5 +8,12 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "~6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "libs\\components\\":"libs/components",
+            "libs\\helpers\\":"libs/helpers",
+            "libs\\models\\":"libs/models"
+        }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+namespace libs\helpers;
 
 /**
  * Class ConfigHelper

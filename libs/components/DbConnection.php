@@ -1,4 +1,5 @@
 <?php
+namespace libs\components;
 
 /**
  * Class DbConnection
