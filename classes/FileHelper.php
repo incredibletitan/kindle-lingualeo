@@ -16,8 +16,8 @@ class FileHelper
      */
     public static function copyFile($source, $destination)
     {
-        if (!file_exists($source)) {
-            throw new Exception("Source file \"$source\" doesn't exist");
+        if (!file_exists($source) && is_readable($source)) {
+            throw new Exception("Cannot read source file \"$source\"");
         }
 
         if (!copy($source, $destination)) {

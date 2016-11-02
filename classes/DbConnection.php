@@ -18,11 +18,22 @@ class DbConnection
     private static $instance;
 
     /**
+     * @param bool $copyToLocalStorage - Copy file to local storage or not
+     *
      * DbConnection constructor.
      */
-    private function __construct()
+    private function __construct($copyToLocalStorage = true)
     {
-        $this->connection = new PDO('sqlite:' . ConfigHelper::getDBConnectionSettings());
+        $sourceDbFilePath = ConfigHelper::getDBConnectionSettings();
+
+        if ($copyToLocalStorage) {
+            $destinationDbFilePath =  __DIR__ . '/../tmp/db.sqlite';
+            FileHelper::copyFile($sourceDbFilePath, $destinationDbFilePath);
+        } else {
+            $destinationDbFilePath = $sourceDbFilePath;
+        }
+
+        $this->connection = new PDO('sqlite:' . $destinationDbFilePath);
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
