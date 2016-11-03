@@ -1,6 +1,9 @@
 <?php
 namespace libs\components;
 
+use libs\helpers\ConfigHelper;
+use libs\helpers\FileHelper;
+
 /**
  * Class DbConnection
  *
@@ -9,7 +12,7 @@ namespace libs\components;
 class DbConnection
 {
     /**
-     * @var PDO - Connection to the DB
+     * @var \PDO - Connection to the DB
      */
     private $connection;
 
@@ -28,14 +31,14 @@ class DbConnection
         $sourceDbFilePath = ConfigHelper::getDBConnectionSettings();
 
         if ($copyToLocalStorage) {
-            $destinationDbFilePath =  __DIR__ . '/../tmp/db.sqlite';
+            $destinationDbFilePath =  __DIR__ . '/../../tmp/db.sqlite';
             FileHelper::copyFile($sourceDbFilePath, $destinationDbFilePath);
         } else {
             $destinationDbFilePath = $sourceDbFilePath;
         }
 
-        $this->connection = new PDO('sqlite:' . $destinationDbFilePath);
-        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->connection = new \PDO('sqlite:' . $destinationDbFilePath);
+        $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     /**
@@ -52,7 +55,7 @@ class DbConnection
     }
 
     /**
-     * @return PDO - Connection to the database
+     * @return \PDO - Connection to the database
      */
     public function getConnection()
     {

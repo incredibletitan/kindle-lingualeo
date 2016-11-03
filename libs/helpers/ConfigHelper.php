@@ -15,9 +15,9 @@ class ConfigHelper
      */
     public static function getConfig()
     {
-        $config = require __DIR__ . '/../config/config.php';
+        $config = require __DIR__ . '/../../config/config.php';
 
-        return file_exists($path = __DIR__ . '/../config/config-local.php') ? array_merge($config, require($path)) : $config;
+        return file_exists($path = __DIR__ . '/../../config/config-local.php') ? array_merge($config, require($path)) : $config;
     }
 
     /**

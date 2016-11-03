@@ -1,6 +1,9 @@
 <?php
 namespace libs\models;
 
+use libs\components\DbConnection;
+
+
 /**
  * Class Vocabulary
  *
@@ -24,6 +27,6 @@ SELECT `w`.`stem`, `l`."usage" FROM `WORDS` `w`
 SQL;
         $smt = $connection->prepare($query);
         $smt->execute();
-        return $smt->fetchAll(PDO::FETCH_OBJ);
+        return $smt->fetchAll(\PDO::FETCH_OBJ);
     }
 }
