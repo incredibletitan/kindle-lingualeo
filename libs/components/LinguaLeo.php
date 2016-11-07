@@ -2,6 +2,7 @@
 namespace libs\components;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 class LinguaLeo
 {
@@ -33,6 +34,7 @@ class LinguaLeo
         $this->setApiUrl($apiUrl);
         $this->setUserEmail($userEmail);
         $this->setUserPassword($userPassword);
+        $this->initClient();
         $this->authorize();
     }
 
@@ -41,15 +43,30 @@ class LinguaLeo
      */
     public function authorize()
     {
-        $this->client = new Client([
-            'timeout' => 10.0,
-            'cookies' => true
-        ]);
+        try {
+            $request = $this->client->request('GET', 'http://lingualeo.com/api/login?' . \GuzzleHttp\Psr7\build_query(
+                    [
+                        'email' => $this->userEmail,
+                        'password' => $this->userPassword
+                    ]
+                )
+            );
+        } catch (RequestException $ex) {
+            echo $ex->getCode();
+            if ($ex->hasResponse()) {
+                echo \GuzzleHttp\Psr7\str($ex->getResponse());
+            }
+        }
+    }
 
-        $this->client->request('GET', 'http://lingualeo.com/api/login?' . \GuzzleHttp\Psr7\build_query([
-                'email' => $this->userEmail,
-                'password' => $this->userPassword
-            ]))->getBody()->getContents();
+    /**
+     * Initializing Guzzle client. If client not specified, use client with default params
+     *
+     * @param Client|null $client
+     */
+    public function initClient(Client $client = null)
+    {
+        $this->client = $client ? $client : new Client(['timeout' => 10.0, 'cookies' => true]);
     }
 
     /**
