@@ -93,16 +93,19 @@ class LinguaLeo
         $this->userPassword = $userPassword;
     }
 
+    /**
+     * @param $url
+     * @param array|null $params
+     * @param bool $decodeJSON
+     * @return mixed|string
+     * @throws \Exception
+     */
     private function getResponse($url, array $params = null, $decodeJSON = true)
     {
-        $queryString = '';
-
-        if ($params) {
-            $queryString = \GuzzleHttp\Psr7\build_query($params);
-        }
+        $queryString = $params ? '?' . \GuzzleHttp\Psr7\build_query($params) : '';
 
         try {
-            $response = $this->client->get($url . '?' . $queryString)->getBody()->getContents();
+            $response = $this->client->get($url . $queryString)->getBody()->getContents();
         } catch (RequestException $ex) {
             $exceptionMessage = 'Code: ' . $ex->getCode() . ';';
 
