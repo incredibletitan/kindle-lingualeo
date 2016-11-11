@@ -39,27 +39,6 @@ class LinguaLeo
     }
 
     /**
-     * Authorization on lingualeo service
-     */
-    public function authorize()
-    {
-        try {
-            $request = $this->client->request('GET', 'http://lingualeo.com/api/login?' . \GuzzleHttp\Psr7\build_query(
-                    [
-                        'email' => $this->userEmail,
-                        'password' => $this->userPassword
-                    ]
-                )
-            );
-        } catch (RequestException $ex) {
-            echo $ex->getCode();
-            if ($ex->hasResponse()) {
-                echo \GuzzleHttp\Psr7\str($ex->getResponse());
-            }
-        }
-    }
-
-    /**
      * Initializing Guzzle client. If client not specified, use client with default params
      *
      * @param Client|null $client
@@ -70,13 +49,24 @@ class LinguaLeo
     }
 
     /**
+     * Authorization on lingualeo service
+     */
+    private function authorize()
+    {
+        $this->getResponse('http://lingualeo.com/api/login', [
+            'email' => $this->userEmail,
+            'password' => $this->userPassword
+        ]);
+    }
+
+    /**
      * Get word translation
      *
      * @param $word
      */
     public function getTranslation($word)
     {
-        $res = $this->client->request('GET', 'http://api.lingualeo.com/gettranslates?' . \GuzzleHttp\Psr7\build_query(['word' => $word]))->getBody()->getContents();
+        return $this->getResponse('http://api.lingualeo.com/gettranslates', ['word' => $word]);
     }
 
     /**
@@ -101,5 +91,26 @@ class LinguaLeo
     public function setUserPassword($userPassword)
     {
         $this->userPassword = $userPassword;
+    }
+
+    private function getResponse($url, array $params = null, $decodeJSON = true)
+    {
+        $queryString = '';
+
+        if ($params) {
+            $queryString = \GuzzleHttp\Psr7\build_query($params);
+        }
+
+        try {
+            $response = $this->client->get($url . '?' . $queryString)->getBody()->getContents();
+        } catch (RequestException $ex) {
+            $exceptionMessage = 'Code: ' . $ex->getCode() . ';';
+
+            if ($ex->hasResponse()) {
+                $exceptionMessage .= 'Response:' . \GuzzleHttp\Psr7\str($ex->getResponse());
+            }
+            throw new \Exception($exceptionMessage);
+        }
+        return $decodeJSON ? \GuzzleHttp\json_decode($response) : $response;
     }
 }
