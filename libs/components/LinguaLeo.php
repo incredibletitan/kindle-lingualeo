@@ -53,20 +53,25 @@ class LinguaLeo
      */
     private function authorize()
     {
-        $this->getResponse('http://lingualeo.com/api/logi', [
+        $this->getResponse('http://lingualeo.com/api/login', [
             'email' => $this->userEmail,
             'password' => $this->userPassword
         ]);
     }
 
-    /**
-     * Get word translation
-     *
-     * @param $word
-     */
-    public function getTranslation($word)
+    public function getTranslations($word)
     {
-        return $this->getResponse('http://api.lingualeo.com/gettranslates', ['word' => $word]);
+        $translationObject = $this->getResponse('http://api.lingualeo.com/gettranslates', ['word' => $word]);
+
+        if (!isset($translationObject->translate) || !is_array($translationObject->translate)) {
+            throw new \InvalidArgumentException('Invalid translation object:' . var_export($translationObject, true));
+        }
+
+        if (isset($translationObject->error_msg) && $translationObject->error_msg) {
+            throw new LinguaLeoApiException('Can\'t translate: ' . $translationObject->error_msg);
+        }
+
+        return $translationObject->translate;
     }
 
     /**
