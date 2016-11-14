@@ -53,7 +53,7 @@ class LinguaLeo
      */
     private function authorize()
     {
-        $this->getResponse('http://lingualeo.com/api/login', [
+        $this->getResponse('http://lingualeo.com/api/logi', [
             'email' => $this->userEmail,
             'password' => $this->userPassword
         ]);
@@ -107,12 +107,7 @@ class LinguaLeo
         try {
             $response = $this->client->get($url . $queryString)->getBody()->getContents();
         } catch (RequestException $ex) {
-            $exceptionMessage = 'Code: ' . $ex->getCode() . ';';
-
-            if ($ex->hasResponse()) {
-                $exceptionMessage .= 'Response:' . \GuzzleHttp\Psr7\str($ex->getResponse());
-            }
-            throw new \Exception($exceptionMessage);
+            throw new LinguaLeoApiException("Server Error", null, $ex);
         }
         return $decodeJSON ? \GuzzleHttp\json_decode($response) : $response;
     }
