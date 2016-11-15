@@ -59,27 +59,53 @@ class LinguaLeo
         ]);
     }
 
-    public function getTranslations($word)
-    {
-        $translationObject = $this->getResponse('http://api.lingualeo.com/gettranslates', ['word' => $word]);
-
-        if (!isset($translationObject->translate) || !is_array($translationObject->translate)) {
-            throw new \InvalidArgumentException('Invalid translation object:' . var_export($translationObject, true));
-        }
-
-        if (isset($translationObject->error_msg) && $translationObject->error_msg) {
-            throw new LinguaLeoApiException('Can\'t translate: ' . $translationObject->error_msg);
-        }
-
-        return $translationObject->translate;
-    }
-
     /**
      * @param $apiUrl
      */
     public function setApiUrl($apiUrl)
     {
         $this->apiUrl = $apiUrl;
+    }
+
+    /**
+     * Get list of word translations
+     *
+     * @param $word - Word needed to be translate
+     * @throws LinguaLeoApiException
+     * @throws \InvalidArgumentException
+     * @return array - Array with translation variants
+     */
+    public function getTranslations($word)
+    {
+        $translationResult = $this->getResponse('http://api.lingualeo.com/gettranslates', ['word' => $word]);
+
+        if (!isset($translationResult['translate']) || !is_array($translationResult['translate'])) {
+            throw new \InvalidArgumentException('Invalid translation object:' . var_export($translationResult, true));
+        }
+
+        if (isset($translationResult['error_msg']) && $translationResult['error_msg']) {
+            throw new LinguaLeoApiException('Can\'t translate: ' . $translationResult['error_msg']);
+        }
+
+        return $translationResult['translate'];
+    }
+
+    /**
+     * Get top rated word translation
+     *
+     * @param $word - Word needed to be translate
+     * @throws LinguaLeoApiException
+     * @throws \InvalidArgumentException
+     * @return mixed
+     */
+    public function getTopRatedTranslation($word)
+    {
+        if (($translations = $this->getTranslations($word))
+            && isset($translations[0])
+            && isset($translations[0]['value'])) {
+            return $translations[0]['value'];
+        }
+        return null;
     }
 
     /**
@@ -114,6 +140,6 @@ class LinguaLeo
         } catch (RequestException $ex) {
             throw new LinguaLeoApiException("Server Error", null, $ex);
         }
-        return $decodeJSON ? \GuzzleHttp\json_decode($response) : $response;
+        return $decodeJSON ? \GuzzleHttp\json_decode($response, true) : $response;
     }
 }
