@@ -9,7 +9,7 @@ class LinguaLeo
     /**
      * @var $apiUrl - Url for LinguaLeo api
      */
-    private $apiUrl;
+    private $apiUrl = 'http://api.lingualeo.com/';
 
     /**
      * @var $userEmail - Email for authentication
@@ -77,9 +77,10 @@ class LinguaLeo
      */
     public function getTranslations($word)
     {
-        $translationResult = $this->getResponse('http://api.lingualeo.com/gettranslates', ['word' => $word]);
+        $translationResult = $this->getResponse($this->apiUrl . '/gettranslates', ['word' => $word]);
 
         if (!isset($translationResult['translate']) || !is_array($translationResult['translate'])) {
+            /*TODO: Choose appropriate exception type*/
             throw new \InvalidArgumentException('Invalid translation object:' . var_export($translationResult, true));
         }
 
@@ -106,6 +107,14 @@ class LinguaLeo
             return $translations[0]['value'];
         }
         return null;
+    }
+
+    public function addWord($word, $translation, $context)
+    {
+        $result = $this->getResponse(
+            $this->apiUrl . '/addword',
+            ['word' => $word, 'tword' => $translation, 'context' => $context]
+        );
     }
 
     /**
