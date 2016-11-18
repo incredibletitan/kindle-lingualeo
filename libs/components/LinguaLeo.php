@@ -29,9 +29,8 @@ class LinguaLeo
     /**
      * Lingualeo constructor.
      */
-    public function __construct($apiUrl, $userEmail, $userPassword)
+    public function __construct($userEmail, $userPassword)
     {
-        $this->setApiUrl($apiUrl);
         $this->setUserEmail($userEmail);
         $this->setUserPassword($userPassword);
         $this->initClient();
@@ -60,14 +59,6 @@ class LinguaLeo
     }
 
     /**
-     * @param $apiUrl
-     */
-    public function setApiUrl($apiUrl)
-    {
-        $this->apiUrl = $apiUrl;
-    }
-
-    /**
      * Get list of word translations
      *
      * @param $word - Word needed to be translate
@@ -80,7 +71,6 @@ class LinguaLeo
         $translationResult = $this->getResponse($this->apiUrl . '/gettranslates', ['word' => $word]);
 
         if (!isset($translationResult['translate']) || !is_array($translationResult['translate'])) {
-            /*TODO: Choose appropriate exception type*/
             throw new \InvalidArgumentException('Invalid translation object:' . var_export($translationResult, true));
         }
 
@@ -97,7 +87,7 @@ class LinguaLeo
      * @param $word - Word needed to be translate
      * @throws LinguaLeoApiException
      * @throws \InvalidArgumentException
-     * @return mixed
+     * @return null|string - Translation
      */
     public function getTopRatedTranslation($word)
     {
@@ -109,12 +99,29 @@ class LinguaLeo
         return null;
     }
 
+    /**
+     * @param $word - Word needed to be translate
+     * @param $translation - Translation
+     * @param $context - Word context. E.g Part of sentence
+     * @throws LinguaLeoApiException
+     * @return array - Result
+     */
     public function addWord($word, $translation, $context)
     {
         $result = $this->getResponse(
             $this->apiUrl . '/addword',
             ['word' => $word, 'tword' => $translation, 'context' => $context]
         );
+
+        if (!isset($result['word_id'])) {
+            throw new \InvalidArgumentException('Invalid translation object:' . var_export($result, true));
+        }
+
+        if (isset($result['error_msg']) && $result['error_msg']) {
+            throw new LinguaLeoApiException('Can\'t translate: ' . $result['error_msg']);
+        }
+
+        return $result;
     }
 
     /**
@@ -131,6 +138,14 @@ class LinguaLeo
     public function setUserPassword($userPassword)
     {
         $this->userPassword = $userPassword;
+    }
+
+    /**
+     * @param $apiUrl
+     */
+    public function setApiUrl($apiUrl)
+    {
+        $this->apiUrl = $apiUrl;
     }
 
     /**

@@ -1,14 +1,12 @@
 <?php
 require 'vendor/autoload.php';
-$config = \libs\helpers\ConfigHelper::getConfig();
+
+use libs\helpers\ConfigHelper;
+use libs\components\LinguaLeo;
+use libs\models\Vocabulary;
+$config = ConfigHelper::getConfig();
 
 try {
-    $ll = new \libs\components\LinguaLeo($config['lingualeo_api_url'], $config['lingualeo_user_email'], $config['lingualeo_user_password']);
-    $words = (new \libs\models\Vocabulary())->getVocabulary();
-//    $ll->addWord('dog', $ll->getTopRatedTranslation('dog'),"what a nice dog");
-
-//    foreach ($words as $word) {
-//    }
 
 } catch (\libs\components\LinguaLeoApiException $ex) {
     echo 'General error: ' . $ex->getMessage();
