@@ -3,7 +3,6 @@ namespace libs\models;
 
 use libs\components\DbConnection;
 
-
 /**
  * Class Vocabulary
  *
@@ -14,7 +13,7 @@ class Vocabulary
     /**
      * Get vocabulary objects
      *
-     * @return array - Array with std objects with 'stem' and 'lookup' fields
+     * @return array - Array with std objects with 'stem' and 'usage' fields
      */
     public function getVocabulary()
     {
