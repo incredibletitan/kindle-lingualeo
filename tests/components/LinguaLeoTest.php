@@ -25,7 +25,12 @@ class LinguaLeoTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $dummyUrl = 'dummy_uri';
+
         $stub->method('getContentByUrl')
-            ->willThrowException(new RequestException('Dummy request exception', new Request('GET', 'dummy_uri')));
+            ->willReturn('dummy_content')
+            ->willThrowException(new RequestException('Dummy request exception', new Request('GET', $dummyUrl)));
+
+        $method->invoke($stub, $dummyUrl);
     }
 }
