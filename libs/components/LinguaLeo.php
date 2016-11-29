@@ -160,10 +160,23 @@ class LinguaLeo
         $queryString = $params ? '?' . \GuzzleHttp\Psr7\build_query($params) : '';
 
         try {
-            $response = $this->client->get($url . $queryString)->getBody()->getContents();
+            $response = $this->getContentByUrl($url . $queryString);
         } catch (RequestException $ex) {
             throw new LinguaLeoApiException("Server Error", null, $ex);
         }
         return $decodeJSON ? \GuzzleHttp\json_decode($response, true) : $response;
+    }
+
+    /**
+     * Get contents by specified url using 'GET' HTTP method
+     *
+     * @param $url - Target url
+     * @throws RequestException
+     *
+     * @return string - Content got by url
+     */
+    private function getContentByUrl($url)
+    {
+        return $this->client->get($url)->getBody()->getContents();
     }
 }
