@@ -175,7 +175,7 @@ class LinguaLeo
      *
      * @return string - Content got by url
      */
-    private function getContentByUrl($url)
+    public function getContentByUrl($url)
     {
         return $this->client->get($url)->getBody()->getContents();
     }
