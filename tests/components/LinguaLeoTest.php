@@ -4,7 +4,6 @@ namespace tests\components;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\TestCase;
-use libs\components\LinguaLeo;
 
 /**
  * Class LinguaLeoTest
@@ -12,9 +11,12 @@ use libs\components\LinguaLeo;
 class LinguaLeoTest extends TestCase
 {
     /**
+     * Tests exception rethrowing in case of Guzzle throw RequestException
+     *
      * @covers LinguaLeo::getResponse
+     * @expectedException libs\components\LinguaLeoApiException
      */
-    public function testGetResponse()
+    public function testLinguaLeoApiExceptionThrowsInGetResponse()
     {
         $reflection = new \ReflectionClass('libs\components\LinguaLeo');
         $method = $reflection->getMethod('getResponse');
