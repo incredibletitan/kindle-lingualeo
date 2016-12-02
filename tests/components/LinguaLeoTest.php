@@ -5,6 +5,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\TestCase;
 use libs\components\LinguaLeoApiException;
+use libs\components\LinguaLeo;
 
 /**
  * Class LinguaLeoTest
@@ -15,7 +16,7 @@ class LinguaLeoTest extends TestCase
      * Tests exception rethrowing in case of Guzzle throw RequestException
      *
      * @covers LinguaLeo::getResponse
-     * @expectedException \libs\components\LinguaLeoApiException
+     * @expectedException LinguaLeoApiException
      */
     public function testLinguaLeoApiExceptionThrowsInGetResponse()
     {
@@ -74,7 +75,7 @@ class LinguaLeoTest extends TestCase
      */
     private function getReflectedMethod($method)
     {
-        $reflection = new \ReflectionClass('libs\components\LinguaLeo');
+        $reflection = new \ReflectionClass(LinguaLeo::class);
         $method = $reflection->getMethod($method);
         $method->setAccessible(true);
 
@@ -89,7 +90,7 @@ class LinguaLeoTest extends TestCase
      */
     private function getMockedObject(array $allowedMethods)
     {
-        return $this->getMockBuilder('libs\components\LinguaLeo')
+        return $this->getMockBuilder(LinguaLeo::class)
             ->setMethods($allowedMethods)
             ->disableOriginalConstructor()
             ->getMock();
