@@ -93,7 +93,8 @@ class LinguaLeo
     {
         if (($translations = $this->getTranslations($word))
             && isset($translations[0])
-            && isset($translations[0]['value'])) {
+            && isset($translations[0]['value'])
+        ) {
             return $translations[0]['value'];
         }
         return null;
@@ -164,7 +165,19 @@ class LinguaLeo
         } catch (RequestException $ex) {
             throw new LinguaLeoApiException("Server Error", null, $ex);
         }
-        return $decodeJSON ? \GuzzleHttp\json_decode($response, true) : $response;
+
+        if ($decodeJSON) {
+            try {
+                $response = \GuzzleHttp\json_decode($response, true);
+            } catch (\InvalidArgumentException $ex) {
+                throw new LinguaLeoApiException(
+                    "Invalid response format. Response:" . var_export($response),
+                    null,
+                    $ex
+                );
+            }
+        }
+        return $response;
     }
 
     /**
