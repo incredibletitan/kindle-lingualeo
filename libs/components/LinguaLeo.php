@@ -63,7 +63,8 @@ class LinguaLeo
      *
      * @param $word - Word needed to be translate
      * @throws LinguaLeoApiException
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException - Valid response from /gettranslates method of LinguaLeo API must
+     * contain 'translate' key and if is not specified InvalidArgumentException will be thrown
      * @return array - Array with translation variants
      */
     public function getTranslations($word)
@@ -156,7 +157,7 @@ class LinguaLeo
      * @return mixed|string
      * @throws LinguaLeoApiException
      */
-    private function getResponse($url, array $params = null, $decodeJSON = true)
+    protected function getResponse($url, array $params = null, $decodeJSON = true)
     {
         $queryString = $params ? '?' . \GuzzleHttp\Psr7\build_query($params) : '';
 

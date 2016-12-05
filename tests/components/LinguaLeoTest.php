@@ -32,6 +32,30 @@ class LinguaLeoTest extends TestCase
     }
 
     /**
+     * @covers LinguaLeo::getTranslations
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetTranslationsThrowsInvalidArgumentException()
+    {
+        $stub = $this->getMockedObject(['getResponse']);
+        $stub->method('getResponse')
+            ->willReturn('Dummy response which doesn\'t contain needed element');
+        $stub->getTranslations('dummy_translation');
+    }
+
+    /**
+     * @covers LinguaLeo::getTranslations
+     * @expectedException \libs\components\LinguaLeoApiException
+     */
+    public function testGetTranslationsThrowsLinguaLeoApiException()
+    {
+        $stub = $this->getMockedObject(['getResponse']);
+        $stub->method('getResponse')
+            ->willReturn(['translate' => ['a' => 'a'], 'error_msg' => 'Bad translation']);
+        $stub->getTranslations('dummy_tranlation');
+    }
+
+    /**
      * Tests exception rethrowing in case of Guzzle throw RequestException
      *
      * @covers LinguaLeo::getResponse
