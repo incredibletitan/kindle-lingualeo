@@ -154,7 +154,7 @@ class LinguaLeo
      * @param array|null $params
      * @param bool $decodeJSON
      * @return mixed|string
-     * @throws \Exception
+     * @throws LinguaLeoApiException
      */
     private function getResponse($url, array $params = null, $decodeJSON = true)
     {
@@ -171,7 +171,7 @@ class LinguaLeo
                 $response = \GuzzleHttp\json_decode($response, true);
             } catch (\InvalidArgumentException $ex) {
                 throw new LinguaLeoApiException(
-                    "Invalid response format. Response:" . var_export($response),
+                    "Invalid response format. Response:" . var_export($response, true),
                     null,
                     $ex
                 );
