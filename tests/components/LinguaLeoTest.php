@@ -4,7 +4,6 @@ namespace tests\components;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\TestCase;
-use libs\components\LinguaLeoApiException;
 use libs\components\LinguaLeo;
 
 /**
@@ -16,9 +15,9 @@ class LinguaLeoTest extends TestCase
      * Tests exception rethrowing in case of Guzzle throw RequestException
      *
      * @covers LinguaLeo::getResponse
-     * @expectedException LinguaLeoApiException
+     * @expectedException \libs\components\LinguaLeoApiException
      */
-    public function testLinguaLeoApiExceptionThrowsInGetResponse()
+    public function testLinguaLeoApiExceptionThrowsInCaseOfRequestExceptionThrewInGetResponse()
     {
         $method = $this->getReflectedMethod('getResponse');
         $stub = $this->getMockedObject(['getContentByUrl']);
@@ -30,6 +29,24 @@ class LinguaLeoTest extends TestCase
             ->willThrowException(new RequestException('Dummy request exception', new Request('GET', $dummyUrl)));
 
         $method->invoke($stub, $dummyUrl);
+    }
+
+    /**
+     * Tests exception rethrowing in case of Guzzle throw RequestException
+     *
+     * @covers LinguaLeo::getResponse
+     * @expectedException \libs\components\LinguaLeoApiException
+     */
+    public function testLinguaLeoApiExceptionThrowsInCaseOfInvalidJSONInGetResponse()
+    {
+        $method = $this->getReflectedMethod('getResponse');
+        $stub = $this->getMockedObject(['getContentByUrl']);
+
+        //Try to convert not valid JSON must throw LinguaLeoApiException
+        $stub->method('getContentByUrl')
+            ->willReturn('[{test1": "1","test2": "2"}]');
+
+        $method->invoke($stub, 'test.cc');
     }
 
     /**
@@ -55,15 +72,6 @@ class LinguaLeoTest extends TestCase
             ->willReturn('[{"test1": "1","test2": "2"}]');
 
         $this->assertEquals([["test1" => '1', "test2" => '2']], $method->invoke($stub, $dummyUrl));
-
-        //Try to convert not valid JSON must throw LinguaLeoApiException
-        $stub->expects($this->at(0))
-            ->method('getContentByUrl')
-            ->willReturn('[{test1": "1","test2": "2"}]');
-
-        $method->invoke($stub, $dummyUrl);
-
-        $this->expectException(LinguaLeoApiException::class);
     }
 
     /**
