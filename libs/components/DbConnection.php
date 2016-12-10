@@ -1,7 +1,6 @@
 <?php
 namespace libs\components;
 
-use libs\helpers\ConfigHelper;
 use libs\helpers\FileHelper;
 
 /**
@@ -28,13 +27,11 @@ class DbConnection
      */
     private function __construct($copyToLocalStorage = true)
     {
-        $sourceDbFilePath = ConfigHelper::getDBConnectionSettings();
+        $sourceDbFilePath =  __DIR__ . '/../../db/db.sqlite';
+        $destinationDbFilePath =  __DIR__ . '/../../tmp/db.sqlite';
 
-        if ($copyToLocalStorage) {
-            $destinationDbFilePath =  __DIR__ . '/../../tmp/db.sqlite';
+        if (!file_exists($destinationDbFilePath)) {
             FileHelper::copyFile($sourceDbFilePath, $destinationDbFilePath);
-        } else {
-            $destinationDbFilePath = $sourceDbFilePath;
         }
 
         $this->connection = new \PDO('sqlite:' . $destinationDbFilePath);
@@ -71,6 +68,6 @@ class DbConnection
      */
     public function attach($dbPath, $alias)
     {
-        self::getInstance()->getConnection()->exec("ATTACH '$dbPath' AS $alias");
+        $this->connection->exec("ATTACH DATABASE '$dbPath' AS $alias");
     }
 }
