@@ -21,12 +21,8 @@ class Vocabulary
      */
     public function __construct()
     {
-        $dbInstance = DbConnection::getInstance();
-
-        if ($sourceDbFilePath = ConfigHelper::getDBConnectionSettings()) {
-            $dbInstance->attach($sourceDbFilePath, 'kindle');
-        }
-        $this->dbConnection = $dbInstance->getConnection();
+        $this->dbConnection =  DbConnection::getInstance()->getConnection();
+        $this->sync();
     }
 
     /**
@@ -37,7 +33,7 @@ class Vocabulary
     public function getVocabulary()
     {
         $query = <<< SQL
-SELECT `w`.`stem`, `l`."usage" FROM kindle.`WORDS` `w`
+SELECT `w`.`stem` FROM `WORDS` `w`
   JOIN LOOKUPS `l`
     ON `w`.id=`l`.word_key
 SQL;
@@ -46,8 +42,34 @@ SQL;
         return $smt->fetchAll(\PDO::FETCH_OBJ);
     }
 
-    public function sync()
+    /**
+     * Sync with project DB with Kindle DB
+     *
+     * @throws \Exception
+     */
+    private function sync()
     {
+        if (!($sourceDbFilePath = ConfigHelper::getDBConnectionSettings())) {
+            throw new \Exception('path_to_vocabulary is empty');
+        }
+        DbConnection::getInstance()->attach($sourceDbFilePath, 'kindle');
 
+        /**
+         * Synchronize lookups
+         */
+        $syncLookupsQuery = <<<SQL
+      INSERT OR IGNORE INTO LOOKUPS(`id`, `word_key`, `usage`, `timestamp`)
+      SELECT `id`, `word_key`, `usage`, `timestamp` FROM kindle.`LOOKUPS`;
+SQL;
+        $this->dbConnection->exec($syncLookupsQuery);
+
+        /**
+         * Synchronize words
+         */
+        $syncWordsQuery = <<<SQL
+      INSERT OR IGNORE INTO WORDS(`id`, `word`, `stem`, `lang`, `category`, `timestamp`)
+      SELECT `id`, `word`, `stem`, `lang`, `category`, `timestamp` FROM kindle.`WORDS`;
+SQL;
+        $this->dbConnection->exec($syncWordsQuery);
     }
 }
