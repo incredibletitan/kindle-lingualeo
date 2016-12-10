@@ -44,12 +44,13 @@ class DbConnection
     /**
      * Get DbConnection instance
      *
+     * @param bool $copyToLocalStorage - Copy file to local storage or not
      * @return DbConnection
      */
-    public static function getInstance()
+    public static function getInstance($copyToLocalStorage = true)
     {
         if (!self::$instance) {
-            self::$instance = new self();
+            self::$instance = new self($copyToLocalStorage);
         }
         return self::$instance;
     }
@@ -60,5 +61,16 @@ class DbConnection
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Attach db to the default
+     *
+     * @param string $dbPath -  Attached DB path
+     * @param string $alias -  Attached DB alias
+     */
+    public function attach($dbPath, $alias)
+    {
+        self::getInstance()->getConnection()->exec("ATTACH '$dbPath' AS $alias");
     }
 }
