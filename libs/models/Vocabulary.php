@@ -33,13 +33,31 @@ class Vocabulary
     public function getVocabulary()
     {
         $query = <<< SQL
-SELECT `w`.`stem` FROM `WORDS` `w`
+SELECT `w`.`id`, `w`.`stem`, `l`.`usage` FROM `WORDS` `w`
   JOIN LOOKUPS `l`
     ON `w`.id=`l`.word_key
+  WHERE `w`.`is_imported`=0
 SQL;
         $smt = $this->dbConnection->prepare($query);
         $smt->execute();
+        
         return $smt->fetchAll(\PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Mark list of words as imported
+     *
+     * @param string $wordsId
+     */
+    public function markAsImported($wordsId)
+    {
+        $updateWordsQuery = <<<SQL
+      UPDATE `WORDS` SET `is_imported`=1
+        WHERE `id`=:wordId
+SQL;
+        $preparedStatement = $this->dbConnection->prepare($updateWordsQuery);
+        $preparedStatement->bindValue(':wordId', $wordsId, \PDO::PARAM_STR);
+        $preparedStatement->execute();
     }
 
     /**
