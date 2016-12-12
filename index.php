@@ -9,11 +9,20 @@ $config = ConfigHelper::getConfig();
 
 try {
     $linguaLeo = new LinguaLeo($config['lingualeo_user_email'], $config['lingualeo_user_password']);
-    $words = (new Vocabulary())->getVocabulary();
+    $vocabularyObject = new Vocabulary();
+    $words = $vocabularyObject->getVocabulary();
 
-    foreach ($words as $word) {
-        $linguaLeo->addWord($word->stem,  $linguaLeo->getTopRatedTranslation($word->stem), $word->usage);
+    if (count($words) > 0) {
+        foreach ($words as $word) {
+            if ($linguaLeo->addWord($word->stem, $linguaLeo->getTopRatedTranslation($word->stem), $word->usage)) {
+                echo  "Word \"{$word->stem}\" added successfully<br/>";
+                $vocabularyObject->markAsImported($word->id);
+            }
+        }
+    } else {
+        echo "No words for import found";
     }
+
 } catch (\libs\components\LinguaLeoApiException $ex) {
     echo 'General error: ' . $ex->getMessage();
 

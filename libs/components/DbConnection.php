@@ -1,7 +1,6 @@
 <?php
 namespace libs\components;
 
-use libs\helpers\ConfigHelper;
 use libs\helpers\FileHelper;
 
 /**
@@ -28,13 +27,11 @@ class DbConnection
      */
     private function __construct($copyToLocalStorage = true)
     {
-        $sourceDbFilePath = ConfigHelper::getDBConnectionSettings();
+        $sourceDbFilePath =  __DIR__ . '/../../db/db.sqlite';
+        $destinationDbFilePath =  __DIR__ . '/../../tmp/db.sqlite';
 
-        if ($copyToLocalStorage) {
-            $destinationDbFilePath =  __DIR__ . '/../../tmp/db.sqlite';
+        if (!file_exists($destinationDbFilePath)) {
             FileHelper::copyFile($sourceDbFilePath, $destinationDbFilePath);
-        } else {
-            $destinationDbFilePath = $sourceDbFilePath;
         }
 
         $this->connection = new \PDO('sqlite:' . $destinationDbFilePath);
@@ -44,12 +41,13 @@ class DbConnection
     /**
      * Get DbConnection instance
      *
+     * @param bool $copyToLocalStorage - Copy file to local storage or not
      * @return DbConnection
      */
-    public static function getInstance()
+    public static function getInstance($copyToLocalStorage = true)
     {
         if (!self::$instance) {
-            self::$instance = new self();
+            self::$instance = new self($copyToLocalStorage);
         }
         return self::$instance;
     }
@@ -60,5 +58,16 @@ class DbConnection
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Attach db to the default
+     *
+     * @param string $dbPath -  Attached DB path
+     * @param string $alias -  Attached DB alias
+     */
+    public function attach($dbPath, $alias)
+    {
+        $this->connection->exec("ATTACH DATABASE '$dbPath' AS $alias");
     }
 }
