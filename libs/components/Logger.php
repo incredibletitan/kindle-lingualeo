@@ -18,7 +18,7 @@ class Logger
      * Logger constructor.
      * @param string $path - Path to log
      */
-    public function __construct($path = null)
+    public function __construct($path)
     {
         $this->logPath = $path;
     }
@@ -31,6 +31,6 @@ class Logger
      */
     public function insert($message)
     {
-        file_put_contents($this->logPath, date('Y-m-d H:i:s') . ':' . $message . "\n");
+        file_put_contents($this->logPath, date('Y-m-d H:i:s') . ': ' . $message . "\n", FILE_APPEND);
     }
 }
